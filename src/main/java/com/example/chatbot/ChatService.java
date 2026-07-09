@@ -2,7 +2,7 @@ package com.example.chatbot;
 
 
 
-import com.example.chatbot.ChatRequest;
+import com.example.chatbot.dto.ChatRequest;
 import com.example.chatbot.ChatResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
