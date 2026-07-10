@@ -1,11 +1,12 @@
-# Step 1: Build stage
+# Step 1: Build Stage
 FROM maven:3.9.6-eclipse-temurin-21 AS build
+WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
-# Step 2: Run stage
+# Step 2: Runtime Stage
 FROM eclipse-temurin:21-jre
-# This line safely finds whatever .war or .jar file Maven built and renames it to app.war
-COPY --from=build /target/*.w* app.war
+WORKDIR /app
+COPY --from=build /app/target/spring-chatbot-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.war"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
