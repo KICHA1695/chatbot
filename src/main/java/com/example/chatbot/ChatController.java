@@ -43,7 +43,7 @@ public class ChatController {
             } else {
                 // Route text queries through your system-optimized ChatService
                 ChatResponse response = chatService.generateResponse(request);
-                model.addAttribute("aiResponse", response.getAiReply()); // Assumes ChatResponse has a getAiReply() getter
+                model.addAttribute("aiResponse", response.getResponse()); // Assumes ChatResponse has a getAiReply() getter
             }
         } catch (Exception e) {
             model.addAttribute("error", "Generation Failed: " + e.getMessage());
