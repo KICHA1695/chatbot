@@ -1,11 +1,8 @@
 package com.example.chatbot;
 
-
 import com.example.chatbot.dto.ChatRequest;
 import com.example.chatbot.ChatResponse;
 import com.example.chatbot.ChatService;
-
-import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,16 +14,17 @@ import java.nio.charset.StandardCharsets;
 @Controller
 public class ChatController {
 
-    private final OllamaChatModel chatModel;
+    private final ChatService chatService;
 
-    public ChatController(OllamaChatModel chatModel) {
-        this.chatModel = chatModel;
+    // Injecting the ChatService instead of the raw OllamaChatModel
+    public ChatController(ChatService chatService) {
+        this.chatService = chatService;
     }
 
     @GetMapping("/")
     public String showChatPage(Model model) {
         ChatRequest defaultRequest = new ChatRequest();
-        defaultRequest.setType("text"); // default to text mode
+        defaultRequest.setType("text"); 
         model.addAttribute("chatRequest", defaultRequest);
         return "chat";
     }
@@ -38,16 +36,14 @@ public class ChatController {
 
         try {
             if ("image".equalsIgnoreCase(request.getType())) {
-                // Generate a safe URL-encoded prompt for the Image Engine
+                // Image requests stay fast because they generate via a quick public URL string
                 String encodedPrompt = URLEncoder.encode(request.getMessage(), StandardCharsets.UTF_8);
-                // Building a high-quality production prompt wrapper around the user text
                 String generatedImageUrl = "https://image.pollinations.ai/prompt/" + encodedPrompt + "?width=1024&height=1024&nologo=true";
-                
                 model.addAttribute("imageUrl", generatedImageUrl);
             } else {
-                // Handle normal local Ollama Text Response
-                String responseText = chatModel.call(request.getMessage());
-                model.addAttribute("aiResponse", responseText);
+                // Route text queries through your system-optimized ChatService
+                ChatResponse response = chatService.generateResponse(request);
+                model.addAttribute("aiResponse", response.getAiReply()); // Assumes ChatResponse has a getAiReply() getter
             }
         } catch (Exception e) {
             model.addAttribute("error", "Generation Failed: " + e.getMessage());

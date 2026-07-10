@@ -1,9 +1,6 @@
 package com.example.chatbot;
 
-
-
 import com.example.chatbot.dto.ChatRequest;
-import com.example.chatbot.ChatResponse;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +9,6 @@ public class ChatService {
 
     private final ChatClient chatClient;
 
-    // ChatClient is automatically initialized via AiConfig
     public ChatService(ChatClient chatClient) {
         this.chatClient = chatClient;
     }
@@ -22,8 +18,9 @@ public class ChatService {
             throw new IllegalArgumentException("Message content cannot be empty");
         }
         
-        // Fluid Fluent API syntax native to modern Spring AI
+        // System instruction forces the model to process faster and output brief text
         String aiReply = chatClient.prompt()
+                .system("You are a helpful assistant. Keep your responses very short, direct, and under 3 sentences.")
                 .user(request.getMessage())
                 .call()
                 .content();
